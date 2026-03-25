@@ -1,20 +1,30 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# BGH Smart AC Home Assistant Integration
 
-# Run and deploy your AI Studio app
+This integration allows you to control BGH Smart AC units directly from Home Assistant using local UDP communication.
 
-This contains everything you need to run your app locally.
+## Features
+- **Local Control**: No cloud required.
+- **HVAC Modes**: Cool, Heat, Dry, Fan, Auto, Off.
+- **Fan Speed**: Low, Medium, High.
+- **Temperature Control**: Set target temperature and view current temperature.
+- **Auto Discovery**: Automatically finds the device ID from the IP address.
 
-View your app in AI Studio: https://ai.studio/apps/f57d0610-64d7-41ad-85aa-b70e1ec72565
+## Installation
 
-## Run Locally
+### HACS (Recommended)
+1. Open HACS in Home Assistant.
+2. Click on "Integrations".
+3. Click the three dots in the top right and select "Custom repositories".
+4. Add this repository URL and select "Integration" as the category.
+5. Search for "BGH Smart AC" and install.
+6. Restart Home Assistant.
 
-**Prerequisites:**  Node.js
+### Manual
+1. Copy the `custom_components/bgh_smart` folder to your Home Assistant `config/custom_components/` directory.
+2. Restart Home Assistant.
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Configuration
+1. Go to **Settings** > **Devices & Services**.
+2. Click **Add Integration**.
+3. Search for **BGH Smart AC**.
+4. Enter the IP address of your AC unit.

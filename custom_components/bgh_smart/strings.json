@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure BGH Smart AC",
+        "description": "Enter the IP address of your BGH Smart AC unit.",
+        "data": {
+          "host": "IP Address"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the AC unit. Please check the IP address and ensure the unit is on the same network."
+    }
+  }
+}

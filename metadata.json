@@ -1,5 +1,5 @@
 {
-  "name": "BGH Smart Web Controller",
-  "description": "A modern web interface for BGH Smart AC units based on the UDP control protocol.",
+  "name": "BGH Smart AC (HA Integration)",
+  "description": "Home Assistant custom integration for BGH Smart AC units using local UDP protocol.",
   "requestFramePermissions": []
 }
