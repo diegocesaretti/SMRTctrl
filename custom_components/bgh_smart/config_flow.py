@@ -15,7 +15,13 @@ class BGHSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             host = user_input[CONF_HOST]
-            device_id = await self._discover_device_id(host)
+            
+            await self.async_set_unique_id(host)
+            self._abort_if_unique_id_configured()
+
+            device_id = await self.hass.async_add_executor_job(
+                self._discover_device_id, host
+            )
             
             if device_id:
                 return self.async_create_entry(
@@ -31,7 +37,7 @@ class BGHSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def _discover_device_id(self, host):
+    def _discover_device_id(self, host):
         """Try to get the device ID from the host."""
         # This implements the 'requestStatus' logic from Processing
         try:
@@ -42,7 +48,7 @@ class BGHSmartConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if len(data) >= 7:
                 # Bytes 1-6 are the device ID
                 return data[1:7].hex()
-        except:
+        except Exception:
             return None
         finally:
             sock.close()

@@ -1,6 +1,5 @@
 from homeassistant.components.climate.const import (
     HVACMode,
-    FanEntityFeature,
     ClimateEntityFeature,
 )
 
