@@ -1,0 +1,5 @@
+{
+  "name": "BGH Smart Web Controller",
+  "description": "A modern web interface for BGH Smart AC units based on the UDP control protocol.",
+  "requestFramePermissions": []
+}
