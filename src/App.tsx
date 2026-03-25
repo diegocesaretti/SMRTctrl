@@ -76,6 +76,8 @@ export default function App() {
                     <li>Add this repository as a <b>Custom Repository</b>.</li>
                     <li>Search for "BGH Smart AC" and install.</li>
                     <li>Restart Home Assistant.</li>
+                    <li>Go to Settings &gt; Devices &amp; Services and add the integration.</li>
+                    <li>Enter your AC unit's <b>IP Address</b> and <b>MAC Address</b>.</li>
                   </ol>
                 </div>
                 <div className="pt-6 border-t border-[#D2D2D7]">
@@ -102,7 +104,7 @@ export default function App() {
                 </div>
                 <div>
                   <p className="text-[#86868B] mb-1">Status Command</p>
-                  <p className="break-all opacity-70">00000000000000accf23aa3190590001e4</p>
+                  <p className="break-all opacity-70">00000000000000[MAC_ADDRESS]590001e4</p>
                 </div>
               </div>
             </div>

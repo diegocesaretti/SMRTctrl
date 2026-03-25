@@ -15,7 +15,6 @@ from .const import (
     DOMAIN,
     UDP_SEND_PORT,
     UDP_RECV_PORT,
-    STATUS_CMD,
     MODE_MAP,
     HA_TO_BGH_MODE,
     FAN_MAP,
@@ -79,7 +78,8 @@ class BGHSmartAC(ClimateEntity):
     async def async_update(self):
         """Fetch state from the device."""
         try:
-            data = await self._send_udp_command(bytes.fromhex(STATUS_CMD))
+            cmd_hex = f"00000000000000{self._device_id}590001e4"
+            data = await self._send_udp_command(bytes.fromhex(cmd_hex))
             if data and len(data) >= 25:
                 self._parse_status(data)
         except Exception as e:
