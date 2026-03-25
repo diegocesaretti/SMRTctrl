@@ -51,7 +51,7 @@ export default function App() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   "Local UDP Control",
-                  "Auto Discovery",
+                  "Manual Configuration",
                   "HVAC Mode Support",
                   "Fan Speed Control",
                   "Temperature Polling",
