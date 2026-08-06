@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectar una pantalla Home Hub",
+        "description": "Ingresá los datos de conexión local que muestra la app Home Hub Legacy.",
+        "data": {
+          "host": "Dirección IP del dispositivo",
+          "port": "Puerto",
+          "token": "Token de API",
+          "name": "Nombre opcional"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "No se pudo conectar o el token fue rechazado."
+    },
+    "abort": {
+      "already_configured": "Este Home Hub ya está configurado."
+    }
+  }
+}
