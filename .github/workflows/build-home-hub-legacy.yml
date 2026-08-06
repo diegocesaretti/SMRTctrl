@@ -1,0 +1,61 @@
+name: Build Home Hub Legacy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - home-hub-legacy
+    paths:
+      - "home-hub-android/**"
+      - "custom_components/home_hub_legacy/**"
+      - ".github/workflows/build-home-hub-legacy.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Validate Home Assistant integration
+        run: python -m compileall -q custom_components/home_hub_legacy
+
+      - name: Build Android 6 APK
+        working-directory: home-hub-android
+        run: gradle --no-daemon :app:assembleDebug --stacktrace
+
+      - name: Package outputs
+        run: |
+          mkdir -p dist
+          cp home-hub-android/app/build/outputs/apk/debug/app-debug.apk dist/HomeHubLegacy-Android6-debug.apk
+          cd custom_components
+          zip -r ../dist/HomeHubLegacy-HomeAssistant-Integration.zip home_hub_legacy -x "*/__pycache__/*" "*.pyc"
+
+      - name: Checksums
+        run: sha256sum dist/* > dist/SHA256SUMS.txt
+
+      - name: Upload APK and integration
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeHubLegacy-Android6
+          path: dist/*
+          if-no-files-found: error
