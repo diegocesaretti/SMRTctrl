@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect an Android Home Hub",
+        "description": "Enter the local connection details shown in the Home Hub Legacy app.",
+        "data": {
+          "host": "Device IP address",
+          "port": "Port",
+          "token": "API token",
+          "name": "Optional display name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect or the token was rejected."
+    },
+    "abort": {
+      "already_configured": "This Home Hub is already configured."
+    }
+  }
+}
