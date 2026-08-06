@@ -17,7 +17,7 @@ import android.os.PowerManager;
 import android.speech.tts.TextToSpeech;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.MediaController;
+import android.widget.MediaController;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -51,14 +51,22 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
     private TextToSpeech textToSpeech;
     private final Handler handler = new Handler();
     private final Runnable hideOverlay = new Runnable() {
-        @Override public void run() { responseOverlay.setVisibility(View.GONE); }
+        @Override
+        public void run() {
+            responseOverlay.setVisibility(View.GONE);
+        }
     };
     private final Runnable clearMotion = new Runnable() {
-        @Override public void run() { HubState.motion = false; }
+        @Override
+        public void run() {
+            HubState.motion = false;
+        }
     };
     private float previousBrightness = -1f;
 
-    static MainActivity getCurrent() { return current.get(); }
+    static MainActivity getCurrent() {
+        return current.get();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +79,13 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         loadDashboard(prefs.getDashboardUrl());
         HubService.start(this);
         initializeTts();
+
         if (!prefs.isConfigured()) {
             handler.postDelayed(new Runnable() {
-                @Override public void run() { openSettings(); }
+                @Override
+                public void run() {
+                    openSettings();
+                }
             }, 500);
         }
     }
@@ -82,26 +94,33 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         FrameLayout root = new FrameLayout(this);
         root.setBackgroundColor(Color.BLACK);
 
-        webView = new WebView(getApplicationContext());
+        webView = new WebView(this);
         root.addView(webView, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
 
         videoView = new VideoView(this);
         videoView.setVisibility(View.GONE);
         videoView.setBackgroundColor(Color.BLACK);
         root.addView(videoView, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
         MediaController mediaController = new MediaController(this);
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
         videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override public void onCompletion(MediaPlayer mp) { stopMedia(); }
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                stopMedia();
+            }
         });
         videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override public boolean onError(MediaPlayer mp, int what, int extra) {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
                 HubState.mediaState = "idle";
-                Toast.makeText(MainActivity.this,
-                        "The built-in player could not open this media.", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "The built-in player could not open this media.", Toast.LENGTH_LONG).show();
                 videoView.setVisibility(View.GONE);
                 return true;
             }
@@ -114,16 +133,23 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         responseOverlay.setGravity(Gravity.CENTER);
         responseOverlay.setPadding(48, 32, 48, 32);
         root.addView(responseOverlay, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
 
         sleepOverlay = new View(this);
         sleepOverlay.setBackgroundColor(Color.BLACK);
         sleepOverlay.setVisibility(View.GONE);
         sleepOverlay.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { wakeScreen(); }
+            @Override
+            public void onClick(View v) {
+                wakeScreen();
+            }
         });
         root.addView(sleepOverlay, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
 
         settingsButton = new Button(this);
         settingsButton.setText("⋮");
@@ -131,12 +157,16 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         settingsButton.setTextColor(Color.WHITE);
         settingsButton.setBackgroundColor(0x55000000);
         settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { openSettings(); }
+            @Override
+            public void onClick(View v) {
+                openSettings();
+            }
         });
         FrameLayout.LayoutParams buttonParams = new FrameLayout.LayoutParams(dp(52), dp(52));
         buttonParams.gravity = Gravity.TOP | Gravity.END;
         buttonParams.setMargins(0, dp(8), dp(8), 0);
         root.addView(settingsButton, buttonParams);
+
         setContentView(root);
     }
 
@@ -161,28 +191,39 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
             CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
         }
         CookieManager.getInstance().setAcceptCookie(true);
+
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
-            @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 return handleExternalUrl(url);
             }
-            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return handleExternalUrl(request.getUrl().toString());
             }
         });
     }
 
     private boolean handleExternalUrl(String url) {
-        if (url.startsWith("http://") || url.startsWith("https://")) return false;
-        try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
-        catch (ActivityNotFoundException ignored) { }
+        if (url.startsWith("http://") || url.startsWith("https://")) {
+            return false;
+        }
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (ActivityNotFoundException ignored) {
+        }
         return true;
     }
 
     private void initializeTts() {
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) textToSpeech.setLanguage(Locale.getDefault());
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    textToSpeech.setLanguage(Locale.getDefault());
+                }
             }
         });
     }
@@ -190,13 +231,19 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
     void loadDashboard(final String url) {
         if (url == null || url.trim().isEmpty()) return;
         runOnUiThread(new Runnable() {
-            @Override public void run() { webView.loadUrl(url); }
+            @Override
+            public void run() {
+                webView.loadUrl(url);
+            }
         });
     }
 
     void reloadDashboard() {
         runOnUiThread(new Runnable() {
-            @Override public void run() { webView.reload(); }
+            @Override
+            public void run() {
+                webView.reload();
+            }
         });
     }
 
@@ -207,7 +254,8 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
     void screenOff() {
         HubState.screenOn = false;
         runOnUiThread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 WindowManager.LayoutParams attributes = getWindow().getAttributes();
                 previousBrightness = attributes.screenBrightness;
                 attributes.screenBrightness = 0.01f;
@@ -225,14 +273,19 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         if (powerManager != null && !powerManager.isInteractive()) {
             PowerManager.WakeLock wakeLock = powerManager.newWakeLock(
                     PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                    "HomeHubLegacy:MotionWake");
+                    "HomeHubLegacy:MotionWake"
+            );
             wakeLock.acquire(3000);
         }
         runOnUiThread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 WindowManager.LayoutParams attributes = getWindow().getAttributes();
-                attributes.screenBrightness = previousBrightness >= 0f
-                        ? previousBrightness : prefs.getBrightness() / 100f;
+                if (previousBrightness >= 0f) {
+                    attributes.screenBrightness = previousBrightness;
+                } else {
+                    attributes.screenBrightness = prefs.getBrightness() / 100f;
+                }
                 getWindow().setAttributes(attributes);
                 sleepOverlay.setVisibility(View.GONE);
                 settingsButton.setVisibility(View.VISIBLE);
@@ -247,7 +300,8 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         if (!HubState.screenOn) return;
         final float level = prefs.getBrightness() / 100f;
         runOnUiThread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 WindowManager.LayoutParams attributes = getWindow().getAttributes();
                 attributes.screenBrightness = level;
                 getWindow().setAttributes(attributes);
@@ -258,10 +312,12 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
     void showText(final String text, final int seconds, final boolean speak) {
         wakeScreen();
         runOnUiThread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 String safeText = text == null ? "" : text.trim();
                 int length = safeText.length();
-                responseOverlay.setTextSize(length < 60 ? 46f : (length < 150 ? 34f : 26f));
+                float size = length < 60 ? 46f : (length < 150 ? 34f : 26f);
+                responseOverlay.setTextSize(size);
                 responseOverlay.setText(safeText);
                 responseOverlay.setVisibility(View.VISIBLE);
                 responseOverlay.bringToFront();
@@ -283,20 +339,20 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         HubState.mediaUrl = url == null ? "" : url;
         HubState.mediaTitle = title == null ? "" : title;
         HubState.mediaState = "playing";
+
         final String selectedPackage = prefs.getPlayerPackage();
         if (selectedPackage != null && !selectedPackage.isEmpty()) {
             runOnUiThread(new Runnable() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(url),
-                            mime == null || mime.isEmpty() ? "video/*" : mime);
+                    intent.setDataAndType(Uri.parse(url), mime == null || mime.isEmpty() ? "video/*" : mime);
                     intent.setPackage(selectedPackage);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    try { startActivity(intent); }
-                    catch (ActivityNotFoundException error) {
-                        Toast.makeText(MainActivity.this,
-                                "Selected media player is unavailable. Using the built-in player.",
-                                Toast.LENGTH_LONG).show();
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException error) {
+                        Toast.makeText(MainActivity.this, "Selected media player is not available. Using the built-in player.", Toast.LENGTH_LONG).show();
                         playBuiltIn(url);
                     }
                 }
@@ -308,7 +364,8 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
 
     private void playBuiltIn(final String url) {
         runOnUiThread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 videoView.setVisibility(View.VISIBLE);
                 videoView.bringToFront();
                 settingsButton.bringToFront();
@@ -320,14 +377,20 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
 
     void pauseMedia() {
         HubState.mediaState = "paused";
-        if (videoView.getVisibility() == View.VISIBLE) videoView.pause();
-        else sendMediaKey(KeyEvent.KEYCODE_MEDIA_PAUSE);
+        if (videoView.getVisibility() == View.VISIBLE) {
+            videoView.pause();
+        } else {
+            sendMediaKey(KeyEvent.KEYCODE_MEDIA_PAUSE);
+        }
     }
 
     void resumeMedia() {
         HubState.mediaState = "playing";
-        if (videoView.getVisibility() == View.VISIBLE) videoView.start();
-        else sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY);
+        if (videoView.getVisibility() == View.VISIBLE) {
+            videoView.start();
+        } else {
+            sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY);
+        }
     }
 
     void stopMedia() {
@@ -335,11 +398,14 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         HubState.mediaUrl = "";
         HubState.mediaTitle = "";
         runOnUiThread(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (videoView.getVisibility() == View.VISIBLE) {
                     videoView.stopPlayback();
                     videoView.setVisibility(View.GONE);
-                } else sendMediaKey(KeyEvent.KEYCODE_MEDIA_STOP);
+                } else {
+                    sendMediaKey(KeyEvent.KEYCODE_MEDIA_STOP);
+                }
             }
         });
     }
@@ -350,15 +416,16 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (manager == null) return;
         int maximum = manager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        manager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                Math.round(maximum * (value / 100f)), 0);
+        manager.setStreamVolume(AudioManager.STREAM_MUSIC, Math.round(maximum * (value / 100f)), 0);
     }
 
     private void sendMediaKey(int keyCode) {
         AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (manager == null) return;
-        manager.dispatchMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
-        manager.dispatchMediaKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
+        KeyEvent down = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
+        KeyEvent up = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
+        manager.dispatchMediaKeyEvent(down);
+        manager.dispatchMediaKeyEvent(up);
     }
 
     void setMotionEnabled(boolean enabled) {
@@ -367,7 +434,10 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
     }
 
     private void configureMotion() {
-        if (!prefs.isMotionEnabled()) { stopMotion(); return; }
+        if (!prefs.isMotionEnabled()) {
+            stopMotion();
+            return;
+        }
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
             return;
@@ -378,11 +448,15 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
     }
 
     private void stopMotion() {
-        if (motionDetector != null) { motionDetector.stop(); motionDetector = null; }
+        if (motionDetector != null) {
+            motionDetector.stop();
+            motionDetector = null;
+        }
         HubState.motion = false;
     }
 
-    @Override public void onMotionDetected() {
+    @Override
+    public void onMotionDetected() {
         HubState.motion = true;
         wakeScreen();
         handler.removeCallbacks(clearMotion);
@@ -402,41 +476,63 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        );
     }
 
-    @Override protected void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
         current = new WeakReference<>(this);
         applyKiosk();
         configureMotion();
     }
 
-    @Override protected void onPause() { super.onPause(); stopMotion(); }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopMotion();
+    }
 
-    @Override protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
         stopMotion();
         handler.removeCallbacksAndMessages(null);
-        if (textToSpeech != null) { textToSpeech.stop(); textToSpeech.shutdown(); }
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
         if (current.get() == this) current.clear();
         super.onDestroy();
     }
 
-    @Override public void onWindowFocusChanged(boolean hasFocus) {
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) applyKiosk();
     }
 
-    @Override public void onBackPressed() {
+    @Override
+    public void onBackPressed() {
         if (responseOverlay.getVisibility() == View.VISIBLE) {
-            responseOverlay.setVisibility(View.GONE); return;
+            responseOverlay.setVisibility(View.GONE);
+            return;
         }
-        if (videoView.getVisibility() == View.VISIBLE) { stopMedia(); return; }
-        if (webView.canGoBack()) { webView.goBack(); return; }
-        if (!prefs.isKiosk()) super.onBackPressed();
+        if (videoView.getVisibility() == View.VISIBLE) {
+            stopMedia();
+            return;
+        }
+        if (webView.canGoBack()) {
+            webView.goBack();
+            return;
+        }
+        if (!prefs.isKiosk()) {
+            super.onBackPressed();
+        }
     }
 
-    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SETTINGS && resultCode == RESULT_OK) {
             applyKiosk();
             loadDashboard(prefs.getDashboardUrl());
@@ -446,16 +542,13 @@ public class MainActivity extends Activity implements MotionDetector.Listener {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override public void onRequestPermissionsResult(
-            int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_CAMERA && grantResults.length > 0
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_CAMERA && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             configureMotion();
         } else if (requestCode == REQUEST_CAMERA) {
             prefs.setMotionEnabled(false);
-            Toast.makeText(this,
-                    "Camera permission is required for motion sensing.",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Camera permission is required for motion sensing.", Toast.LENGTH_LONG).show();
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
